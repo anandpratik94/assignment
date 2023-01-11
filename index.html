@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Assignment</title>
+</head>
+
+<body>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.datatables.net/searchpanes/2.1.0/css/searchPanes.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.5.0/css/select.dataTables.min.css">
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/searchpanes/2.1.0/js/dataTables.searchPanes.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+        src="https://cdn.datatables.net/select/1.5.0/js/dataTables.select.min.js"></script>
+
+    <table id="realtime" class="display" width="100%">
+
+        <tfoot>
+            <tr>
+                <th>Cluster </th>
+                <th>Tag 1</th>
+                <th>Tag 2</th>
+                <th>Tag 3</th>
+                <th>Metric 1</th>
+                <th>Metric 2</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script>
+
+        var dataSet = [];
+        const dataTable = $('#realtime').DataTable({
+            ajax: '/snapsort',
+            data: dataSet,
+            columns: [
+                { title: 'Cluster', data: 'cluster_name' },
+                { title: 'Tag1', data: 'tag_1' },
+                { title: 'Tag2', data: 'tag_2' },
+                { title: 'Tag3', data: 'tag_3' },
+                { title: 'Metric1', data: 'metric_1' },
+                { title: 'Metric2', data: 'metric_2' }
+            ]
+        });
+
+        $('#realtime tfoot th').each(function () {
+            var title = $(this).text();
+            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+        });
+
+        dataTable.columns().every(function () {
+            var that = this;
+
+            $('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
+
+        const socket = io();
+        socket.on("connect", async () => {
+            console.log('[Frontend] Connected to the server');
+        });
+
+        socket.on("events_fd", async (msg) => {
+            msg = JSON.parse(msg);
+            console.log(`[FD] Received events from: ${msg.cluster_name}`);
+            console.log(msg,);
+            addRow(msg)
+        });
+
+        var clusterMap = {};
+
+        function addRow(msg) {
+            const addedRow = dataTable.row.add(msg).draw();
+            addedRow.draw(false);
+        }
+
+        function get_cluster_name(event) {
+            return event.cluster_name;
+        }
+    </script>
+
+</body>
+
+</html>
