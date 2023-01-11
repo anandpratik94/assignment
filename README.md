@@ -1,18 +1,18 @@
 # Assignment
 
-Technology used: `NodeJs, SocketIo, Jquery
+Technology used: `NodeJs, SocketIo, Jquery`
 
 Features:
-- There will be many clusters that are emiting events with a very high speed at a given socket connection. Please see the `Generator Server Setup` for details.
+- There will be many clusters that are emiting events with high speed at a given socket connection. Please see the `Generator Server Setup` for details.
 - Main server:
   - Provide a socket connection for the clusters to connect.
   - Emit the data received from all the clusters to the frontend using socket.
-  - Create perodic snapsort for the data.
+  - Create perodic snapshot for the data.
   - Exposed a public API `/snapsort` for the frontend to load the latest snap on page load.
 - Frontend:
   - Connect with the main server with socket connection.
   - Receives the high frequency data stream from the main server.
-  - Displays all he live events to the user using [datatable](https://datatables.net/)
+  - Displays all live events to the user using [datatable](https://datatables.net/)
   - User can sort and search.
 
 ##### NodeJS
